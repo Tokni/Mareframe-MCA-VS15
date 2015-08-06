@@ -140,6 +140,60 @@ function getUrlParameter(sParam) {
     }
 }//borrowed code
 
+function getValueFn(xVal, posX, posY) {
+
+	var y = 0;
+
+	var a = posY / ((posX -0.1) * (posX - 100.1)) + 100.1 / ((100.1 - 0.1) * (100.1 - posX));
+	var b = - posY * (0.1 + 100.1) / ((posX - 0.1) * (posX - 100.1)) - 100.1 * (0.1 + posX) / ((100.1 - 0.1) * (100.1 - posX));
+
+	//y = 0 * (xVal - posX) * (xVal - 1) / ((0 - posX) * (0 - 1)) + posY * (xVal - 0) * (xVal - 1) / ((posX - 0) * (posX - 1)) + 1 * (xVal - 0) * (xVal - posX) / ((1 - 0) * (1 - posX))
+
+	y =a*(xVal*xVal)+b*xVal+0
+
+	//console.log("y=" + y);
+	return y;
+
+	//var A = 1 - 3 * posX + 3 * posX;
+	//var B = 3 * posX - 6 * posX;
+	//var C = 3 * posX;
+
+	//var E = 1 - 3 * posY + 3 * posY;
+	//var F = 3 * posY - 6 * posY;
+	//var G = 3 * posY;
+
+	//// Solve for t given x (using Newton-Raphelson), then solve for y given t.
+	//// Assume for the first guess that t = x.
+	//var currentT = xVal;
+	//var nRefinementIterations = 50;
+	//for (var i = 0; i < nRefinementIterations; i++) {
+	//    var currentX = xFromT(currentT, A, B, C);
+	//    var currentSlope = slopeFromT(currentT, A, B, C);
+	//    currentT -= (currentX - xVal) * (currentSlope);
+	//    currentT = Math.max(0, Math.min(currentT, 1));
+	//}
+
+	//var y = yFromT(currentT, E, F, G);
+	//return y;
+
+
+	//// Helper functions:
+	//function slopeFromT(t, A, B, C) {
+	//    var dtdx = 1.0 / (3.0 * A * t * t + 2.0 * B * t + C);
+	//    return dtdx;
+	//}
+
+	//function xFromT(t, A, B, C) {
+	//    var x = A * (t * t * t) + B * (t * t) + C * t;
+	//    return x;
+	//}
+
+	//function yFromT(t, E, F, G) {
+	//    var y = E * (t * t * t) + F * (t * t) + G * t;
+	//    return y;
+	//}
+}
+
 
 
 MareFrame.DST.Model = function () {
@@ -220,47 +274,6 @@ MareFrame.DST.Model = function () {
     };
 
 
-    function getValueFn(xVal, posX, posY) {
-
-        var A = 1 - 3 * posX + 3 * posX;
-        var B = 3 * posX - 6 * posX;
-        var C = 3 * posX;
-
-        var E = 1 - 3 * posY + 3 * posY;
-        var F = 3 * posY - 6 * posY;
-        var G = 3 * posY;
-
-        // Solve for t given x (using Newton-Raphelson), then solve for y given t.
-        // Assume for the first guess that t = x.
-        var currentT = xVal;
-        var nRefinementIterations = 5;
-        for (var i = 0; i < nRefinementIterations; i++) {
-            var currentX = xFromT(currentT, A, B, C);
-            var currentSlope = slopeFromT(currentT, A, B, C);
-            currentT -= (currentX - xVal) * (currentSlope);
-            currentT = Math.max(0, Math.min(currentT, 1));
-        }
-
-        var y = yFromT(currentT, E, F, G);
-        return y;
-
-
-        // Helper functions:
-        function slopeFromT(t, A, B, C) {
-            var dtdx = 1.0 / (3.0 * A * t * t + 2.0 * B * t + C);
-            return dtdx;
-        }
-
-        function xFromT(t, A, B, C) {
-            var x = A * (t * t * t) + B * (t * t) + C * t;
-            return x;
-        }
-
-        function yFromT(t, E, F, G) {
-            var y = E * (t * t * t) + F * (t * t) + G * t;
-            return y;
-        }
-    }
 
     this.getWeightedData = function (elmt, addHeader) {
         var tempMatrix = [];
@@ -273,19 +286,33 @@ MareFrame.DST.Model = function () {
                     tempMatrix.push([dataMatrix[0][i], dataMatrix[elmt.getData()[0]][i]]);
                 }
                 break;
-            case 0: //attribute
-                var maxVal = 0;
+        	case 0: //attribute
+				//set minimum and maximum values
+            	var maxVal = elmt.getData()[5];
+            	var minVal = elmt.getData()[4];
+
+				//check if data is within min-max values, and expand as necessary
                 for (var i = 1; i < dataMatrix.length - 1; i++) {
                     if (dataMatrix[i][elmt.getData()[0]] > maxVal) {
                         maxVal = dataMatrix[i][elmt.getData()[0]];
                     }
                 }
+
+                for (var i = 1; i < dataMatrix.length - 1; i++) {
+                	if (dataMatrix[i][elmt.getData()[0]] < minVal) {
+                		minVal = dataMatrix[i][elmt.getData()[0]];
+                	}
+                }
+
+
+				//calculate weights according to valueFn
                 for (var i = 1; i < dataMatrix.length - 1; i++) {
 
                     var toAdd = [this.getElement(dataMatrix[i][0]).getName(), dataMatrix[i][elmt.getData()[0]]];
-                    if (!addHeader)
-                        toAdd.push(getValueFn(dataMatrix[i][elmt.getData()[0]] / maxVal, (elmt.getData()[1] / 99) + 0.5, (elmt.getData()[2] / 99) + 0.5));
-                    console.log(elmt.getData()[1]);
+                    if (!addHeader) {
+                    	toAdd.push(getValueFn(Math.abs(elmt.getData()[3] - ((dataMatrix[i][elmt.getData()[0]] - minVal) / (maxVal - minVal))), Math.abs(elmt.getData()[3] - ((elmt.getData()[1] / 100))),1-Math.abs(elmt.getData()[3] -  (elmt.getData()[2] / 100))));
+                    }
+                    //console.log(elmt.getData()[1]);
                     tempMatrix.push(toAdd);
                 }
                 break;
@@ -447,7 +474,7 @@ MareFrame.DST.Model = function () {
 };
 
 MareFrame.DST.Element = function () {
-    var data = [];
+	var data = [];
     var id = "elmt" + new Date().getTime();
     var name = "Element";
     var description = "write description here";

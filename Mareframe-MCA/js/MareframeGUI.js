@@ -5,10 +5,11 @@ MareFrame.DST.GUIHandler = function () {
 	var controlP = new createjs.Shape();
 	var valueFnStage = new createjs.Container();
 	var valueFnLineCont = new createjs.Container();
+	var valueFnSize = 100;
 	var stage = new createjs.Container();
 	var googleColors = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac", "#b77322", "#16d620", "#b91383", "#f4359e", "#9c5935", "#a9c413", "#2a778d", "#668d1c", "#bea413", "#0c5922", "#743411"];
 	var hitArea = new createjs.Shape(new createjs.Graphics().beginFill("#ffffff").drawRect(0, 0, canvas.canvas.width, canvas.canvas.height));
-	var valFnBkGr = new createjs.Shape(new createjs.Graphics().beginFill("#ffffff").drawRect(0, 0, 100, 100));
+	var valFnBkGr = new createjs.Shape(new createjs.Graphics().beginFill("#ffffff").drawRect(0, 0, valueFnSize, valueFnSize));
 
 	hitArea.name = "hitarea";
 	if (editorMode)
@@ -134,6 +135,7 @@ MareFrame.DST.GUIHandler = function () {
 		}
 	}
 
+
 	this.populateElmtDetails = function (elmtID) {
 
 		var elmt = h.getActiveModel().getElement(elmtID);
@@ -242,20 +244,41 @@ MareFrame.DST.GUIHandler = function () {
 				controlP.x = cPX;
 				controlP.y = cPY;
 				valFnBkGr.name = elmt.getID();
+				$("#valueFn_Flip").data("name",elmt.getID());
+				$("#valueFn_Linear").data("name", elmt.getID());
 				var maxVal = 0;
 				for (var i = 1; i < tableMat.length; i++) {
 					if (tableMat[i][1] > maxVal)
 						maxVal = tableMat[i][1];
 				}
+
+				//set minimum and maximum values
+				var maxVal = elmt.getData()[5];
+				var minVal = elmt.getData()[4];
+
+				//check if data is within min-max values, and expand as necessary
+				for (var i = 1; i < tableMat.length - 1; i++) {
+					if (tableMat[i][1] > maxVal) {
+						maxVal = tableMat[i][1];
+					}
+				}
+
+				for (var i = 1; i < tableMat.length - 1; i++) {
+					if (tableMat[i][1] < minVal) {
+						minVal = tableMat[i][1];
+					}
+				}
+
+
 				for (var i = 1; i < tableMat.length; i++) {
 					console.log(tableMat[i][1]);
-					var vertLine = new createjs.Shape(getValueFnLine(tableMat[i][1] / maxVal * 100, googleColors[i - 1]));
+					var vertLine = new createjs.Shape(getValueFnLine((tableMat[i][1] - minVal) / (maxVal - minVal) * valueFnSize, googleColors[i - 1]));
 
 					valueFnLineCont.addChild(vertLine);
 				}
 
 
-				updateValFnCP(cPX, cPY);
+				updateValFnCP(cPX, cPY, elmt.getData()[3]);
 				updateDataTableDiv(elmt);
 
 
@@ -277,10 +300,16 @@ MareFrame.DST.GUIHandler = function () {
 		document.getElementById("description_div").innerHTML = elmt.getDescription();
 	};
 
-	function updateValFnCP(cPX, cPY) {
-
+	function updateValFnCP(cPX, cPY, flipped_numBool) {
+		var functionSegments = 10;
+		
+		console.log("(" + cPX + "," + cPY + ")");
 		valueFnStage.removeAllChildren();
-		var line = new createjs.Graphics().beginStroke("#0f0f0f").mt(0, 100).bt(cPX, cPY, cPX, cPY, 100, 0);
+		var line = new createjs.Graphics().beginStroke("#0f0f0f").mt(0, valueFnSize - (valueFnSize * flipped_numBool)).qt(cPX,cPY,valueFnSize,0+(valueFnSize * flipped_numBool));
+		//for (var i = 1; i <= functionSegments; i++)
+		//{
+		//	line.lt(i * (valueFnSize / functionSegments), valueFnSize - (valueFnSize * getValueFn(i * (100 / functionSegments), cPX, valueFnSize-cPY)));
+		//}
 		var plot = new createjs.Shape(line);
 		valueFnStage.addChild(plot);
 		valueFnCanvas.update();
@@ -305,20 +334,37 @@ MareFrame.DST.GUIHandler = function () {
 	}
 
 	function moveValFnCP(e) {
-		elmt = h.getActiveModel().getElement(e.target.name);
+		var elmt = h.getActiveModel().getElement(e.target.name);
 		controlP.x = e.stageX;
 		controlP.y = e.stageY;
 		elmt.getData()[1] = e.stageX;
 		elmt.getData()[2] = e.stageY;
-		updateValFnCP(e.stageX, e.stageY);
+		updateValFnCP(e.stageX, e.stageY,elmt.getData()[3]);
 		updateDataTableDiv(elmt);
 
 		update = true;
 		h.gui.updateFinalScores();
 	}
 
+	this.linearizeValFn = function () {
+		
+		moveValFnCP({ stageX: 50, stageY: 50, target: { name: $("#valueFn_Linear").data("name") } });
+		
+	}
+
+	this.flipValFn = function () {
+	
+
+		var elmt = h.getActiveModel().getElement($("#valueFn_Flip").data("name"));
+
+		elmt.getData()[3] = Math.abs(elmt.getData()[3] - 1);
+		updateValFnCP(elmt.getData()[1], elmt.getData()[2], elmt.getData()[3]);
+		updateDataTableDiv(elmt);
+		update = true;
+	}
+
 	function getValueFnLine(xValue, color) {
-		return new createjs.Graphics().beginStroke(color).mt(xValue, 0).lt(xValue, 100);
+		return new createjs.Graphics().beginStroke(color).mt(xValue, 0).lt(xValue, valueFnSize);
 	}
 
 
