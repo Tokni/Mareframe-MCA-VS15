@@ -142,56 +142,56 @@ function getUrlParameter(sParam) {
 
 function getValueFn(xVal, posX, posY) {
 
-	var y = 0;
+	//var y = 0;
 
-	var a = posY / ((posX -0.1) * (posX - 100.1)) + 100.1 / ((100.1 - 0.1) * (100.1 - posX));
-	var b = - posY * (0.1 + 100.1) / ((posX - 0.1) * (posX - 100.1)) - 100.1 * (0.1 + posX) / ((100.1 - 0.1) * (100.1 - posX));
+	//var a = posY / ((posX -0.1) * (posX - 100.1)) + 100.1 / ((100.1 - 0.1) * (100.1 - posX));
+	//var b = - posY * (0.1 + 100.1) / ((posX - 0.1) * (posX - 100.1)) - 100.1 * (0.1 + posX) / ((100.1 - 0.1) * (100.1 - posX));
 
-	//y = 0 * (xVal - posX) * (xVal - 1) / ((0 - posX) * (0 - 1)) + posY * (xVal - 0) * (xVal - 1) / ((posX - 0) * (posX - 1)) + 1 * (xVal - 0) * (xVal - posX) / ((1 - 0) * (1 - posX))
+	////y = 0 * (xVal - posX) * (xVal - 1) / ((0 - posX) * (0 - 1)) + posY * (xVal - 0) * (xVal - 1) / ((posX - 0) * (posX - 1)) + 1 * (xVal - 0) * (xVal - posX) / ((1 - 0) * (1 - posX))
 
-	y =a*(xVal*xVal)+b*xVal+0
+	//y =a*(xVal*xVal)+b*xVal+0
 
-	//console.log("y=" + y);
-	return y;
-
-	//var A = 1 - 3 * posX + 3 * posX;
-	//var B = 3 * posX - 6 * posX;
-	//var C = 3 * posX;
-
-	//var E = 1 - 3 * posY + 3 * posY;
-	//var F = 3 * posY - 6 * posY;
-	//var G = 3 * posY;
-
-	//// Solve for t given x (using Newton-Raphelson), then solve for y given t.
-	//// Assume for the first guess that t = x.
-	//var currentT = xVal;
-	//var nRefinementIterations = 50;
-	//for (var i = 0; i < nRefinementIterations; i++) {
-	//    var currentX = xFromT(currentT, A, B, C);
-	//    var currentSlope = slopeFromT(currentT, A, B, C);
-	//    currentT -= (currentX - xVal) * (currentSlope);
-	//    currentT = Math.max(0, Math.min(currentT, 1));
-	//}
-
-	//var y = yFromT(currentT, E, F, G);
+	////console.log("y=" + y);
 	//return y;
 
+	var A = 1 - 3 * posX + 3 * posX;
+	var B = 3 * posX - 6 * posX;
+	var C = 3 * posX;
 
-	//// Helper functions:
-	//function slopeFromT(t, A, B, C) {
-	//    var dtdx = 1.0 / (3.0 * A * t * t + 2.0 * B * t + C);
-	//    return dtdx;
-	//}
+	var E = 1 - 3 * posY + 3 * posY;
+	var F = 3 * posY - 6 * posY;
+	var G = 3 * posY;
 
-	//function xFromT(t, A, B, C) {
-	//    var x = A * (t * t * t) + B * (t * t) + C * t;
-	//    return x;
-	//}
+	// Solve for t given x (using Newton-Raphelson), then solve for y given t.
+	// Assume for the first guess that t = x.
+	var currentT = xVal;
+	var nRefinementIterations = 50;
+	for (var i = 0; i < nRefinementIterations; i++) {
+	    var currentX = xFromT(currentT, A, B, C);
+	    var currentSlope = slopeFromT(currentT, A, B, C);
+	    currentT -= (currentX - xVal) * (currentSlope);
+	    currentT = Math.max(0, Math.min(currentT, 1));
+	}
 
-	//function yFromT(t, E, F, G) {
-	//    var y = E * (t * t * t) + F * (t * t) + G * t;
-	//    return y;
-	//}
+	var y = yFromT(currentT, E, F, G);
+	return y;
+
+
+	// Helper functions:
+	function slopeFromT(t, A, B, C) {
+	    var dtdx = 1.0 / (3.0 * A * t * t + 2.0 * B * t + C);
+	    return dtdx;
+	}
+
+	function xFromT(t, A, B, C) {
+	    var x = A * (t * t * t) + B * (t * t) + C * t;
+	    return x;
+	}
+
+	function yFromT(t, E, F, G) {
+	    var y = E * (t * t * t) + F * (t * t) + G * t;
+	    return y;
+	}
 }
 
 
@@ -244,20 +244,40 @@ MareFrame.DST.Model = function () {
     this.getFinalScore = function () {
         var tempMatrix = JSON.parse(JSON.stringify(dataMatrix));
         var weightsArr = this.getWeights(mainObjective);
+    	
 
         //console.log(tempMatrix);
         for (var i = 0; i < weightsArr.length; i++) {
-            var currentMax = 0;
-            for (var j = 1; j < tempMatrix.length; j++) {
-                if (tempMatrix[j][i + 1] > currentMax) {
-                    currentMax = tempMatrix[j][i + 1];
-                }
-            }
-            var elmtData = h.getActiveModel().getElement(dataMatrix[0][i + 1]).getData();
+        	var elmtData = h.getActiveModel().getElement(dataMatrix[0][i + 1]).getData();
+
+        	//set minimum and maximum values
+        	var maxVal = elmtData[5];
+        	var minVal = elmtData[4];
+
+        	//check if data is within min-max values, and expand as necessary
+        	for (var j = 1; j < tempMatrix.length - 1; j++) {
+        		if (tempMatrix[j][i+1] > maxVal) {
+        			maxVal = tempMatrix[j][i+1];
+        		}
+        	}
+
+        	for (var j = 1; j < tempMatrix.length - 1; j++) {
+        		if (tempMatrix[j][i+1] < minVal) {
+        			minVal = tempMatrix[j][i+1];
+        		}
+        	}
+
+        	//var currentMax = 0;
+            //for (var j = 1; j < tempMatrix.length; j++) {
+            //    if (tempMatrix[j][i + 1] > currentMax) {
+            //        currentMax = tempMatrix[j][i + 1];
+            //    }
+            //}
+            
             for (var j = 1; j < tempMatrix.length - 1; j++) {
 
-
-                tempMatrix[j][i + 1] = getValueFn(tempMatrix[j][i + 1] / currentMax, (elmtData[1] / 99) + 0.5, (elmtData[2] / 99) + 0.5);
+            	      
+                tempMatrix[j][i + 1] = getValueFn(Math.abs(elmtData[3] - ((tempMatrix[j][i + 1] -minVal) / (maxVal-minVal))),Math.abs(elmtData[3] - ((elmtData[1] / 100))), 1- (elmtData[2] / 100));
                 //console.log(getValueFn(tempMatrix[j][i + 1] / currentMax, elmtData[1]/100, elmtData[2]/100));
                 //console.log(tempMatrix[j][i + 1] / currentMax);
                 tempMatrix[j][i + 1] *= weightsArr[i][1];
@@ -310,7 +330,7 @@ MareFrame.DST.Model = function () {
 
                     var toAdd = [this.getElement(dataMatrix[i][0]).getName(), dataMatrix[i][elmt.getData()[0]]];
                     if (!addHeader) {
-                    	toAdd.push(getValueFn(Math.abs(elmt.getData()[3] - ((dataMatrix[i][elmt.getData()[0]] - minVal) / (maxVal - minVal))), Math.abs(elmt.getData()[3] - ((elmt.getData()[1] / 100))),1-Math.abs(elmt.getData()[3] -  (elmt.getData()[2] / 100))));
+                    	toAdd.push(getValueFn(Math.abs(elmt.getData()[3] - ((dataMatrix[i][elmt.getData()[0]] - minVal) / (maxVal - minVal))),Math.abs(elmt.getData()[3] - ((elmt.getData()[1] / 100))),1 -  (elmt.getData()[2] / 100)));
                     }
                     //console.log(elmt.getData()[1]);
                     tempMatrix.push(toAdd);

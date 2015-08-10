@@ -301,11 +301,11 @@ MareFrame.DST.GUIHandler = function () {
 	};
 
 	function updateValFnCP(cPX, cPY, flipped_numBool) {
-		var functionSegments = 10;
+		//var functionSegments = 10;
 		
 		console.log("(" + cPX + "," + cPY + ")");
 		valueFnStage.removeAllChildren();
-		var line = new createjs.Graphics().beginStroke("#0f0f0f").mt(0, valueFnSize - (valueFnSize * flipped_numBool)).qt(cPX,cPY,valueFnSize,0+(valueFnSize * flipped_numBool));
+		var line = new createjs.Graphics().beginStroke("#0f0f0f").mt(0, valueFnSize - (valueFnSize * flipped_numBool)).bt(cPX, cPY,cPX, cPY, valueFnSize, 0 + (valueFnSize * flipped_numBool));
 		//for (var i = 1; i <= functionSegments; i++)
 		//{
 		//	line.lt(i * (valueFnSize / functionSegments), valueFnSize - (valueFnSize * getValueFn(i * (100 / functionSegments), cPX, valueFnSize-cPY)));
@@ -313,7 +313,7 @@ MareFrame.DST.GUIHandler = function () {
 		var plot = new createjs.Shape(line);
 		valueFnStage.addChild(plot);
 		valueFnCanvas.update();
-		update = true;
+		//update = true;
 		$("#valueFn_div").show();
 	}
 
@@ -342,7 +342,7 @@ MareFrame.DST.GUIHandler = function () {
 		updateValFnCP(e.stageX, e.stageY,elmt.getData()[3]);
 		updateDataTableDiv(elmt);
 
-		update = true;
+		//update = true;
 		h.gui.updateFinalScores();
 	}
 
@@ -360,7 +360,8 @@ MareFrame.DST.GUIHandler = function () {
 		elmt.getData()[3] = Math.abs(elmt.getData()[3] - 1);
 		updateValFnCP(elmt.getData()[1], elmt.getData()[2], elmt.getData()[3]);
 		updateDataTableDiv(elmt);
-		update = true;
+		//update = true;
+		h.gui.updateFinalScores();
 	}
 
 	function getValueFnLine(xValue, color) {
