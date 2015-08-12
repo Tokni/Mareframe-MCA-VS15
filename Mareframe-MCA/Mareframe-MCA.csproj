@@ -44,7 +44,19 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <TypeScriptCompile Include="ts\Connection.ts" />
+    <TypeScriptCompile Include="ts\Declarations\createjs-lib.d.ts" />
+    <TypeScriptCompile Include="ts\Declarations\easeljs.d.ts" />
+    <TypeScriptCompile Include="ts\Declarations\google.visualization.d.ts" />
+    <TypeScriptCompile Include="ts\Declarations\jquery.d.ts" />
+    <TypeScriptCompile Include="ts\Declarations\jqueryui.d.ts" />
+    <TypeScriptCompile Include="ts\Declarations\tweenjs.d.ts" />
+    <TypeScriptCompile Include="ts\Element.ts" />
+    <TypeScriptCompile Include="ts\FileIO.ts" />
+    <TypeScriptCompile Include="ts\Handler.ts" />
+    <TypeScriptCompile Include="ts\MareframeGUI.ts" />
     <TypeScriptCompile Include="ts\Model.ts" />
+    <TypeScriptCompile Include="ts\Tools.ts" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
@@ -75,6 +87,16 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptRemoveComments>false</TypeScriptRemoveComments>
     <TypeScriptSourceMap>true</TypeScriptSourceMap>
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
+    <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
+    <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
+    <TypeScriptOutFile />
+    <TypeScriptOutDir />
+    <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
+    <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
+    <TypeScriptMapRoot />
+    <TypeScriptSourceRoot />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <TypeScriptRemoveComments>true</TypeScriptRemoveComments>

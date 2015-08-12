@@ -6,19 +6,19 @@
 
 module Mareframe.DST {
     export class Model {
-        private elementArr: Mareframe.DST.Element[] = [];
-        private connectionArr: Mareframe.DST.Connection[] = [];
+        private elementArr: any[] = [];
+        private connectionArr: any[] = [];
         private modelName: string = "untitled";
         private modelPath: string = "./";
         private modelChanged: boolean = true;
         private dataMatrix: any[][] = [];
-        private mainObjective: Mareframe.DST.Element;
+        private mainObjective: any;
         //constructor() { };
 
-        setMainObj(goalElmt: Mareframe.DST.Element): void {
+        setMainObj(goalElmt: any): void {
             this.mainObjective = goalElmt;
         }
-        getMainObj(): Mareframe.DST.Element {
+        getMainObj(): any {
             return this.mainObjective;
         }
         getDataMatrix(): any {
@@ -27,26 +27,10 @@ module Mareframe.DST {
         setDataMatrix(Matrix: any[][]): void {
             this.dataMatrix = Matrix;
         }
-        getWeights(elmt: Mareframe.DST.Element): number[][]{
-            var weightsArr: number[][] = [];
-            if (elmt.getType() != 0) {
-                var total: number = 0.0;
-                elmt.getData()[1].forEach(function (val: number) { total += val; });
-                for (var i = 0; i < elmt.getData()[0].length; i++) {
-                    var childWeights:number[][] = this.getWeights(this.getConnection(elmt.getData()[0][i]).getInput());
-                    for (var j = 0; j < childWeights.length; j++) {
-                        childWeights[j][1] *= (elmt.getData()[1][i] / total);
-                    }
-                    weightsArr = weightsArr.concat(childWeights);
-                }
-            } else {
-                weightsArr.push([elmt.getData()[0], 1]);
-            }
-            return weightsArr;
-        }
+        
         getFinalScore(): number[][]{
             var tempMatrix = JSON.parse(JSON.stringify(this.dataMatrix));
-            var weightsArr = this.getWeights(this.mainObjective);
+            var weightsArr = Tools.getWeights(this.mainObjective, this);
     	
 
             //console.log(tempMatrix);
@@ -80,7 +64,7 @@ module Mareframe.DST {
                 for (var j = 1; j < tempMatrix.length - 1; j++) {
 
 
-                    tempMatrix[j][i + 1] = Mareframe.DST.Math.getValueFn(Math.abs(elmtData[3] - ((tempMatrix[j][i + 1] - minVal) / (maxVal - minVal))), Math.abs(elmtData[3] - ((elmtData[1] / 100))), 1 - (elmtData[2] / 100));
+                    tempMatrix[j][i + 1] = Mareframe.DST.Tools.getValueFn(Math.abs(elmtData[3] - ((tempMatrix[j][i + 1] - minVal) / (maxVal - minVal))), Math.abs(elmtData[3] - ((elmtData[1] / 100))), 1 - (elmtData[2] / 100));
                     //console.log(getValueFn(tempMatrix[j][i + 1] / currentMax, elmtData[1]/100, elmtData[2]/100));
                     //console.log(tempMatrix[j][i + 1] / currentMax);
                     tempMatrix[j][i + 1] *= weightsArr[i][1];
@@ -96,7 +80,7 @@ module Mareframe.DST {
             return tempMatrix;
         }
 
-        getWeightedData(elmt: Mareframe.DST.Element, addHeader: boolean): any[][] {
+        getWeightedData(elmt: any, addHeader: boolean): any[][] {
             var tempMatrix = [];
             if (addHeader) {
                 tempMatrix.push(['string', 'number']);
@@ -131,7 +115,7 @@ module Mareframe.DST {
 
                         var toAdd = [this.getElement(this.dataMatrix[i][0]).getName(), this.dataMatrix[i][elmt.getData()[0]]];
                         if (!addHeader) {
-                            toAdd.push(Mareframe.DST.Math.getValueFn(Math.abs(elmt.getData()[3] - ((this.dataMatrix[i][elmt.getData()[0]] - minVal) / (maxVal - minVal))), Math.abs(elmt.getData()[3] - ((elmt.getData()[1] / 100))), 1 - (elmt.getData()[2] / 100)));
+                            toAdd.push(Mareframe.DST.Tools.getValueFn(Math.abs(elmt.getData()[3] - ((this.dataMatrix[i][elmt.getData()[0]] - minVal) / (maxVal - minVal))), Math.abs(elmt.getData()[3] - ((elmt.getData()[1] / 100))), 1 - (elmt.getData()[2] / 100)));
                         }
                         //console.log(elmt.getData()[1]);
                         tempMatrix.push(toAdd);
@@ -163,13 +147,13 @@ module Mareframe.DST {
             return tempMatrix;
         }
 
-        createNewElement(): Mareframe.DST.Element {
-            var e = new MareFrame.DST.Element();
+        createNewElement(): any {
+            var e = "ugh";
             this.elementArr.push(e);
             return e;
 
         }
-        getElement(id: string): Mareframe.DST.Element {
+        getElement(id: string): any {
             return this.elementArr[this.getObjectIndex(id)];
         }
         private getObjectIndex(id: string): number {
@@ -197,13 +181,13 @@ module Mareframe.DST {
             }
             return key;
         }
-        getConnectionArr(): Mareframe.DST.Connection {
+        getConnectionArr(): any {
             return this.connectionArr;
         }
-        getConnection(id: string): Mareframe.DST.Connection {
+        getConnection(id: string): any {
             return this.connectionArr[this.getObjectIndex(id)];
         }
-        getElementArr(): Mareframe.DST.Element {
+        getElementArr(): any {
             return this.elementArr;
         }
         deleteElement(id): void {
@@ -214,7 +198,7 @@ module Mareframe.DST {
         getName(): string {
             return this.modelName;
         }
-        addConnection(connection: Mareframe.DST.Connection): boolean {
+        addConnection(connection: any): boolean {
             var validConn = true;
             this.connectionArr.forEach(function (conn) {
 
@@ -240,8 +224,8 @@ module Mareframe.DST {
         }
         fromJSON(jsonElmt: any): void {
 
-            $("#modelHeader").html(jsonElmt.mdlName);
-            $("#model_header").append(jsonElmt.mdlName);
+            //$("#modelHeader").html(jsonElmt.mdlName);
+            //$("#model_header").append(jsonElmt.mdlName);
             this.modelName = jsonElmt.mdlName;
 
 
@@ -251,9 +235,9 @@ module Mareframe.DST {
             var maxY = 0;
 
             jsonElmt.elements.forEach(function (elmt) {
-                var e = h.gui.addElementToStage();
-                e.fromJSON(elmt);
-                h.gui.updateElement(e);
+                //var e = h.gui.addElementToStage();
+                //e.fromJSON(elmt);
+                //h.gui.updateElement(e);
                 if (elmt.posX > maxX)
                     maxX = elmt.posX;
 
@@ -263,19 +247,19 @@ module Mareframe.DST {
             });
 
             jsonElmt.connections.forEach(function (conn) {
-                var inpt = h.getActiveModel().getElement(conn.connInput);
-                var c = new MareFrame.DST.Connection(inpt, this.getElement(conn.connOutput));
-                c.fromJSON(conn);
-                if (this.addConnection(c)) {
-                    h.gui.addConnectionToStage(c);
-                }
+                //var inpt = h.getActiveModel().getElement(conn.connInput);
+                //var c = new MareFrame.DST.Connection(inpt, this.getElement(conn.connOutput));
+                //c.fromJSON(conn);
+                //if (this.addConnection(c)) {
+                //    h.gui.addConnectionToStage(c);
+                //}
             });
             this.mainObjective = this.getElement(jsonElmt.mainObj);
 
-            h.gui.setSize(maxX + 80, maxY + 20);
+            //h.gui.setSize(maxX + 80, maxY + 20);
 
             this.dataMatrix = jsonElmt.dataMat;
-            h.gui.updateTable(this.dataMatrix);
+            //h.gui.updateTable(this.dataMatrix);
         }
 
 

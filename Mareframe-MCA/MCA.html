@@ -21,9 +21,14 @@
     <script>
         google.load("visualization", "1.0", { "packages": ["corechart","table"] });
     </script>
+    <script src="ts/Handler.js"></script>
     <script src="ts/Model.js"></script>
+    <script src="ts/Tools.js"></script>
+    <script src="ts/FileIO.js"></script>
+    <script src="ts/Element.js"></script>
+    <script src="ts/Connection.js"></script>
     <script src="js/Mareframe.js"></script>
-    <script src="js/MareframeGUI.js"></script>
+    <script src="ts/MareframeGUI.js"></script>
     
 
     <div class="container">
@@ -99,6 +104,7 @@
         <div id="chart_div"></div>
     </div>
     <script>
+        console.log("something");
         $("#valueFn_Linear").button();
         $("#valueFn_Flip").button();
         $("#cnctTool").button();
@@ -141,7 +147,6 @@
         $("#datatable_div").hide();
         $("#description_div").hide();
         $("#chart_div").hide();
-
 
     </script>
 

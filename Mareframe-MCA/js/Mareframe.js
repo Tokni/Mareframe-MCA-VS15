@@ -2,197 +2,197 @@
 MareFrame.DST = MareFrame.DST || {};
 
 
-MareFrame.DST.Handler = function () {
-    var modelArr = [];
-    var activeModel;
-    this.fileHandler = new MareFrame.DST.FileIO();
+//MareFrame.DST.Handler = function () {
+//    var modelArr = [];
+//    var activeModel;
+//    this.fileHandler = new MareFrame.DST.FileIO();
 
 
-    console.log("javascript handler");
-    this.init = function () {
-        console.log("handler init running");
-        var loadModel = getUrlParameter('model');
-        if (loadModel !== null) {
-            h.fileHandler.QuickLoad(loadModel);
-        } else {
-            this.addNewModel();
-        }
-    };
+//    console.log("javascript handler");
+//    this.init = function () {
+//        console.log("handler init running");
+//        var loadModel = getUrlParameter('model');
+//        if (loadModel !== null) {
+//            h.fileHandler.QuickLoad(loadModel);
+//        } else {
+//            this.addNewModel();
+//        }
+//    };
 
 
 
-    this.getGUI = function () {
-        return gui;
-    };
-    this.setGUI = function (g) {
-        this.gui = g;
-    };
+//    this.getGUI = function () {
+//        return gui;
+//    };
+//    this.setGUI = function (g) {
+//        this.gui = g;
+//    };
 
-    this.getFileIO = function () {
-        return fileHandler;
-    };
+//    this.getFileIO = function () {
+//        return fileHandler;
+//    };
 
-    this.addNewModel = function () {
-        var mdl = new MareFrame.DST.Model;
-        //modelArr.push(mdl);
-        this.setActiveModel(mdl);
-        h.gui.clear();
-        //console.log(mdl)
-        return mdl;
-    };
+//    this.addNewModel = function () {
+//        var mdl = new MareFrame.DST.Model;
+//        //modelArr.push(mdl);
+//        this.setActiveModel(mdl);
+//        h.gui.clear();
+//        //console.log(mdl)
+//        return mdl;
+//    };
 
-    this.addModel = function (m) {
-        modelArr.push(m);
-    };
+//    this.addModel = function (m) {
+//        modelArr.push(m);
+//    };
 
-    this.closeModel = function (e) {
+//    this.closeModel = function (e) {
 
-    };
+//    };
 
-    this.setActiveModel = function (m) {
-        activeModel = m;
-        //h.gui.importStage();
-    };
+//    this.setActiveModel = function (m) {
+//        activeModel = m;
+//        //h.gui.importStage();
+//    };
 
-    this.getActiveModel = function () {
-        return activeModel;
-    };
-
-
-};
-
-MareFrame.DST.FileIO = function () {
-    var LastPath = "";
-    this.SaveModel = function (m) {
-
-    };
-
-    this.QuickSave = function () {
-        var m = h.getActiveModel();
-        var json = JSON.stringify(m);
-        localStorage.setItem("temp", json);
-    };
-
-    this.QuickLoad = function (model) {
-        var path = "";
-        switch (model) {
-            case "baltic":
-                path = "JSON/baltic.json";
-                break;
-            case "blackSea":
-                path = "JSON/blackSea.json";
-                break;
-            case "cadiz":
-                path = "JSON/cadiz.json";
-                break;
-            case "iceland":
-                path = "JSON/iceland.json";
-                break;
-            case "northSea":
-                path = "JSON/northSea.json";
-                break;
-            case "scotland":
-                path = "JSON/scotland.json";
-                break;
-            case "sicily":
-                path = "JSON/sicily.json";
-                break;
-            default:
-                break;
-        }
-        //var jsonMdl = JSON.parse(localStorage.getItem("temp"));
-        //if (jsonMdl) {
-        //	console.log("localstorage not empty");
-
-        //	var mdl = h.addNewModel();
-        //	mdl.fromJSON(jsonMdl);
-
-        //}
-        //else {
-        console.log("localstorage empty");
-        console.log(path);
-        jQuery.getJSON(path, function (data) {
-
-            //console.log(data);
-            var mdl = h.addNewModel();
-            mdl.fromJSON(data);
-            h.gui.updateFinalScores();
-        });
-
-        //}
-
-    };
-};
-
-function pause(milliseconds) {
-    var dt = new Date();
-    while ((new Date()) - dt <= milliseconds) { /* Do nothing */ }
-}//borrowed code
-
-function getUrlParameter(sParam) {
-    var sPageURL = window.location.search.substring(1);
-    var sURLVariables = sPageURL.split('&');
-    for (var i = 0; i < sURLVariables.length; i++) {
-        var sParameterName = sURLVariables[i].split('=');
-        if (sParameterName[0] === sParam) {
-            return sParameterName[1];
-        }
-    }
-}//borrowed code
-
-function getValueFn(xVal, posX, posY) {
-
-	//var y = 0;
-
-	//var a = posY / ((posX -0.1) * (posX - 100.1)) + 100.1 / ((100.1 - 0.1) * (100.1 - posX));
-	//var b = - posY * (0.1 + 100.1) / ((posX - 0.1) * (posX - 100.1)) - 100.1 * (0.1 + posX) / ((100.1 - 0.1) * (100.1 - posX));
-
-	////y = 0 * (xVal - posX) * (xVal - 1) / ((0 - posX) * (0 - 1)) + posY * (xVal - 0) * (xVal - 1) / ((posX - 0) * (posX - 1)) + 1 * (xVal - 0) * (xVal - posX) / ((1 - 0) * (1 - posX))
-
-	//y =a*(xVal*xVal)+b*xVal+0
-
-	////console.log("y=" + y);
-	//return y;
-
-	var A = 1 - 3 * posX + 3 * posX;
-	var B = 3 * posX - 6 * posX;
-	var C = 3 * posX;
-
-	var E = 1 - 3 * posY + 3 * posY;
-	var F = 3 * posY - 6 * posY;
-	var G = 3 * posY;
-
-	// Solve for t given x (using Newton-Raphelson), then solve for y given t.
-	// Assume for the first guess that t = x.
-	var currentT = xVal;
-	var nRefinementIterations = 50;
-	for (var i = 0; i < nRefinementIterations; i++) {
-	    var currentX = xFromT(currentT, A, B, C);
-	    var currentSlope = slopeFromT(currentT, A, B, C);
-	    currentT -= (currentX - xVal) * (currentSlope);
-	    currentT = Math.max(0, Math.min(currentT, 1));
-	}
-
-	var y = yFromT(currentT, E, F, G);
-	return y;
+//    this.getActiveModel = function () {
+//        return activeModel;
+//    };
 
 
-	// Helper functions:
-	function slopeFromT(t, A, B, C) {
-	    var dtdx = 1.0 / (3.0 * A * t * t + 2.0 * B * t + C);
-	    return dtdx;
-	}
+//};
 
-	function xFromT(t, A, B, C) {
-	    var x = A * (t * t * t) + B * (t * t) + C * t;
-	    return x;
-	}
+//MareFrame.DST.FileIO = function () {
+//    var LastPath = "";
+//    this.SaveModel = function (m) {
 
-	function yFromT(t, E, F, G) {
-	    var y = E * (t * t * t) + F * (t * t) + G * t;
-	    return y;
-	}
-}
+//    };
+
+//    this.QuickSave = function () {
+//        var m = h.getActiveModel();
+//        var json = JSON.stringify(m);
+//        localStorage.setItem("temp", json);
+//    };
+
+//    this.QuickLoad = function (model) {
+//        var path = "";
+//        switch (model) {
+//            case "baltic":
+//                path = "JSON/baltic.json";
+//                break;
+//            case "blackSea":
+//                path = "JSON/blackSea.json";
+//                break;
+//            case "cadiz":
+//                path = "JSON/cadiz.json";
+//                break;
+//            case "iceland":
+//                path = "JSON/iceland.json";
+//                break;
+//            case "northSea":
+//                path = "JSON/northSea.json";
+//                break;
+//            case "scotland":
+//                path = "JSON/scotland.json";
+//                break;
+//            case "sicily":
+//                path = "JSON/sicily.json";
+//                break;
+//            default:
+//                break;
+//        }
+//        //var jsonMdl = JSON.parse(localStorage.getItem("temp"));
+//        //if (jsonMdl) {
+//        //	console.log("localstorage not empty");
+
+//        //	var mdl = h.addNewModel();
+//        //	mdl.fromJSON(jsonMdl);
+
+//        //}
+//        //else {
+//        console.log("localstorage empty");
+//        console.log(path);
+//        jQuery.getJSON(path, function (data) {
+
+//            //console.log(data);
+//            var mdl = h.addNewModel();
+//            mdl.fromJSON(data);
+//            h.gui.updateFinalScores();
+//        });
+
+//        //}
+
+//    };
+//};
+
+//function pause(milliseconds) {
+//    var dt = new Date();
+//    while ((new Date()) - dt <= milliseconds) { /* Do nothing */ }
+//}//borrowed code
+
+//function getUrlParameter(sParam) {
+//    var sPageURL = window.location.search.substring(1);
+//    var sURLVariables = sPageURL.split('&');
+//    for (var i = 0; i < sURLVariables.length; i++) {
+//        var sParameterName = sURLVariables[i].split('=');
+//        if (sParameterName[0] === sParam) {
+//            return sParameterName[1];
+//        }
+//    }
+//}//borrowed code
+
+//function getValueFn(xVal, posX, posY) {
+
+//	//var y = 0;
+
+//	//var a = posY / ((posX -0.1) * (posX - 100.1)) + 100.1 / ((100.1 - 0.1) * (100.1 - posX));
+//	//var b = - posY * (0.1 + 100.1) / ((posX - 0.1) * (posX - 100.1)) - 100.1 * (0.1 + posX) / ((100.1 - 0.1) * (100.1 - posX));
+
+//	////y = 0 * (xVal - posX) * (xVal - 1) / ((0 - posX) * (0 - 1)) + posY * (xVal - 0) * (xVal - 1) / ((posX - 0) * (posX - 1)) + 1 * (xVal - 0) * (xVal - posX) / ((1 - 0) * (1 - posX))
+
+//	//y =a*(xVal*xVal)+b*xVal+0
+
+//	////console.log("y=" + y);
+//	//return y;
+
+//	var A = 1 - 3 * posX + 3 * posX;
+//	var B = 3 * posX - 6 * posX;
+//	var C = 3 * posX;
+
+//	var E = 1 - 3 * posY + 3 * posY;
+//	var F = 3 * posY - 6 * posY;
+//	var G = 3 * posY;
+
+//	// Solve for t given x (using Newton-Raphelson), then solve for y given t.
+//	// Assume for the first guess that t = x.
+//	var currentT = xVal;
+//	var nRefinementIterations = 50;
+//	for (var i = 0; i < nRefinementIterations; i++) {
+//	    var currentX = xFromT(currentT, A, B, C);
+//	    var currentSlope = slopeFromT(currentT, A, B, C);
+//	    currentT -= (currentX - xVal) * (currentSlope);
+//	    currentT = Math.max(0, Math.min(currentT, 1));
+//	}
+
+//	var y = yFromT(currentT, E, F, G);
+//	return y;
+
+
+//	// Helper functions:
+//	function slopeFromT(t, A, B, C) {
+//	    var dtdx = 1.0 / (3.0 * A * t * t + 2.0 * B * t + C);
+//	    return dtdx;
+//	}
+
+//	function xFromT(t, A, B, C) {
+//	    var x = A * (t * t * t) + B * (t * t) + C * t;
+//	    return x;
+//	}
+
+//	function yFromT(t, E, F, G) {
+//	    var y = E * (t * t * t) + F * (t * t) + G * t;
+//	    return y;
+//	}
+//}
 
 
 
@@ -493,161 +493,161 @@ function getValueFn(xVal, posX, posY) {
 //    };
 //};
 
-MareFrame.DST.Element = function () {
-	var data = [];
-    var id = "elmt" + new Date().getTime();
-    var name = "Element";
-    var description = "write description here";
-    var type = 1;
-    var weightingMethod = 1;
-    var connections = [];
+//MareFrame.DST.Element = function () {
+//	var data = [];
+//    var id = "elmt" + new Date().getTime();
+//    var name = "Element";
+//    var description = "write description here";
+//    var type = 1;
+//    var weightingMethod = 1;
+//    var connections = [];
 
-    this.getData = function () {
-        return data;
-    };
-    this.setData = function (d) {
-        data = d;
-    };
+//    this.getData = function () {
+//        return data;
+//    };
+//    this.setData = function (d) {
+//        data = d;
+//    };
 
-    this.getID = function () {
-        return id;
-    };
-    this.setId = function (i) {
-        id = i;
-    };
-    this.getName = function () {
-        return name;
-    };
-    this.setName = function (n) {
-        name = n;
-    };
-    this.getDescription = function () {
-        return description;
-    };
-    this.setDescription = function (d) {
-        description = d;
-    };
-    this.getType = function () {
-        return type;
-    };
-    this.setType = function (t) {
-        type = t;
-    };
-    this.getMethod = function () {
-        return weightingMethod;
-    };
+//    this.getID = function () {
+//        return id;
+//    };
+//    this.setId = function (i) {
+//        id = i;
+//    };
+//    this.getName = function () {
+//        return name;
+//    };
+//    this.setName = function (n) {
+//        name = n;
+//    };
+//    this.getDescription = function () {
+//        return description;
+//    };
+//    this.setDescription = function (d) {
+//        description = d;
+//    };
+//    this.getType = function () {
+//        return type;
+//    };
+//    this.setType = function (t) {
+//        type = t;
+//    };
+//    this.getMethod = function () {
+//        return weightingMethod;
+//    };
 
-    this.setMethod = function (i) {
-        weightingMethod = i;
-    };
-
-
-    this.deleteConnection = function (id) {
-        var key = 0;
-        this.connections.every(function (elm) {
-            if (elm.getID() === id)
-                return false;
-            else {
-                key = key + 1;
-                return true;
-            }
-        });
-        connections[key];
-
-        connections.splice(key, 1);
+//    this.setMethod = function (i) {
+//        weightingMethod = i;
+//    };
 
 
-    };
-    this.deleteAllConnections = function () {
-        connections.forEach(function (c) {
-            c.deleteThis(this.id);
-        });
+//    this.deleteConnection = function (id) {
+//        var key = 0;
+//        this.connections.every(function (elm) {
+//            if (elm.getID() === id)
+//                return false;
+//            else {
+//                key = key + 1;
+//                return true;
+//            }
+//        });
+//        connections[key];
 
-        connections = [];
-    };
-    this.addConnection = function (e) {
-        connections.push(e);
-    };
-    this.getConnections = function () {
-        return connections;
-    };
-    this.toJSON = function () {
-
-        return { posX: this.easelElmt.x, posY: this.easelElmt.y, elmtID: this.getID(), elmtName: name, elmtDesc: this.getDescription(), elmtType: this.getType(), elmtData: this.getData(), elmtWghtMthd: this.weightingMethod };
-    };
-    this.fromJSON = function (jsonElmt) {
-        this.easelElmt.x = jsonElmt.posX;
-        this.easelElmt.y = jsonElmt.posY;
-        this.setID(jsonElmt.elmtID);
-        name = jsonElmt.elmtName;
-        this.setName(jsonElmt.elmtName);
-        this.setDescription(jsonElmt.elmtDesc);
-        this.setType(jsonElmt.elmtType);
-        this.setData(jsonElmt.elmtData);
-        this.setMethod(jsonElmt.elmtWghtMthd);
-    };
-
-};
+//        connections.splice(key, 1);
 
 
+//    };
+//    this.deleteAllConnections = function () {
+//        connections.forEach(function (c) {
+//            c.deleteThis(this.id);
+//        });
+
+//        connections = [];
+//    };
+//    this.addConnection = function (e) {
+//        connections.push(e);
+//    };
+//    this.getConnections = function () {
+//        return connections;
+//    };
+//    this.toJSON = function () {
+
+//        return { posX: this.easelElmt.x, posY: this.easelElmt.y, elmtID: this.getID(), elmtName: name, elmtDesc: this.getDescription(), elmtType: this.getType(), elmtData: this.getData(), elmtWghtMthd: this.weightingMethod };
+//    };
+//    this.fromJSON = function (jsonElmt) {
+//        this.easelElmt.x = jsonElmt.posX;
+//        this.easelElmt.y = jsonElmt.posY;
+//        this.setID(jsonElmt.elmtID);
+//        name = jsonElmt.elmtName;
+//        this.setName(jsonElmt.elmtName);
+//        this.setDescription(jsonElmt.elmtDesc);
+//        this.setType(jsonElmt.elmtType);
+//        this.setData(jsonElmt.elmtData);
+//        this.setMethod(jsonElmt.elmtWghtMthd);
+//    };
+
+//};
 
 
 
-MareFrame.DST.Connection = function (eIn, eOut) {
-    var inputElement = eIn;
-    var outputElement = eOut;
-    var id = "conn" + new Date().getTime();
 
-    this.deleteThis = function (calledElement) {
-        if (inputElement.getID() === calledElement) {
-            outputElement.deleteConnection(id);
-        } else {
-            inputElement.deleteConnection(id);
 
-        }
-    };
+//MareFrame.DST.Connection = function (eIn, eOut) {
+//    var inputElement = eIn;
+//    var outputElement = eOut;
+//    var id = "conn" + new Date().getTime();
 
-    this.getID = function () {
-        return id;
-    };
+//    this.deleteThis = function (calledElement) {
+//        if (inputElement.getID() === calledElement) {
+//            outputElement.deleteConnection(id);
+//        } else {
+//            inputElement.deleteConnection(id);
 
-    this.setID = function (i) {
-        id = i;
-    };
+//        }
+//    };
 
-    this.setInput = function (e) {
-        inputElement = e;
-    };
+//    this.getID = function () {
+//        return id;
+//    };
 
-    this.setOutput = function (e) {
-        outputElement = e;
-    };
+//    this.setID = function (i) {
+//        id = i;
+//    };
 
-    this.getInput = function () {
-        return inputElement;
-    };
+//    this.setInput = function (e) {
+//        inputElement = e;
+//    };
 
-    this.getOutput = function () {
-        return outputElement;
-    };
+//    this.setOutput = function (e) {
+//        outputElement = e;
+//    };
 
-    this.flip = function () {
-        var e = inputElement;
-        inputElement = outputElement;
-        outputElement = e;
+//    this.getInput = function () {
+//        return inputElement;
+//    };
 
-        inputElement.deleteConnection(id);
-        outputElement.addConnection(id);
-    };
+//    this.getOutput = function () {
+//        return outputElement;
+//    };
 
-    this.toJSON = function () {
-        return { connInput: inputElement.getID(), connOutput: outputElement.getID(), connID: id };
-    };
+//    this.flip = function () {
+//        var e = inputElement;
+//        inputElement = outputElement;
+//        outputElement = e;
 
-    this.fromJSON = function (jsonElmt) {
-        id = jsonElmt.connID;
-    };
-};
+//        inputElement.deleteConnection(id);
+//        outputElement.addConnection(id);
+//    };
+
+//    this.toJSON = function () {
+//        return { connInput: inputElement.getID(), connOutput: outputElement.getID(), connID: id };
+//    };
+
+//    this.fromJSON = function (jsonElmt) {
+//        id = jsonElmt.connID;
+//    };
+//};
 
 
 //console.log("model name: " + h.getActiveModel().getName());
@@ -672,12 +672,12 @@ MareFrame.DST.Connection = function (eIn, eOut) {
 
 $(document).ready(function () {
 
-    h = new MareFrame.DST.Handler();
+    h= new Mareframe.DST.Handler();
 
     if (MareFrame.DST.GUIHandler) {
         console.log("guihandler found");
         MareFrame.DST.GUIHandler();
-        h.init();
+        //h.init();
     }
 
     $("#button").bind("click", function (e) {
