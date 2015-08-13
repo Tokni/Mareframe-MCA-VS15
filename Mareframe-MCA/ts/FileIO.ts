@@ -19,9 +19,10 @@ module Mareframe {
                     return null;
                 }
             }
-            loadModel(p_model:string): any {
+            loadModel(p_modelStringIdent: string, p_activeModelInstance: Model, p_updateGui: Function): any {
+                console.log("attempting to load " + p_modelStringIdent);
                 var path: string = "";
-                switch (p_model) {
+                switch (p_modelStringIdent) {
                     case "baltic":
                         path = "JSON/baltic.json";
                         break;
@@ -39,6 +40,7 @@ module Mareframe {
                         break;
                     case "scotland":
                         path = "JSON/scotland.json";
+                        //path = "../JSON/scotland.json";
                         break;
                     case "sicily":
                         path = "JSON/sicily.json";
@@ -46,9 +48,12 @@ module Mareframe {
                     default:
                         break;
                 }
+                console.log("resulting path is: " + path);
                 jQuery.getJSON(path, function (data) {
-                    return data;
-                })
+
+                    p_activeModelInstance.fromJSON(data);
+                    p_updateGui();
+                });
             }
         }
     }

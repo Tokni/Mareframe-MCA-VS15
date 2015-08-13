@@ -221,25 +221,25 @@ MareFrame.DST = MareFrame.DST || {};
 //        dataMatrix = mat;
 //    };
 
-//    this.getWeights = function (elmt) {
-//        var weightsArr = [];
+    this.getWeights = function (elmt) {
+        var weightsArr = [];
 
-//        //traverse down the tree and store the weights for each attrib, normalized to fraction of 1 each level
-//        if (elmt.getType() !== 0) {
-//            var total = 0.0;
-//            elmt.getData()[1].forEach(function (val) { total += val; });
-//            for (var i = 0; i < elmt.getData()[0].length; i++) {
-//                var childWeights = this.getWeights(this.getConnection(elmt.getData()[0][i]).getInput());
-//                for (var j = 0; j < childWeights.length; j++) {
-//                    childWeights[j][1] *= (elmt.getData()[1][i] / total);
-//                }
-//                weightsArr = weightsArr.concat(childWeights);
-//            }
-//        } else {
-//            weightsArr.push([elmt.getData()[0], 1]);
-//        }
-//        return weightsArr;
-//    };
+        //traverse down the tree and store the weights for each attrib, normalized to fraction of 1 each level
+        if (elmt.getType() !== 0) {
+            var total = 0.0;
+            elmt.getData()[1].forEach(function (val) { total += val; });
+            for (var i = 0; i < elmt.getData()[0].length; i++) {
+                var childWeights = this.getWeights(this.getConnection(elmt.getData()[0][i]).getInput());
+                for (var j = 0; j < childWeights.length; j++) {
+                    childWeights[j][1] *= (elmt.getData()[1][i] / total);
+                }
+                weightsArr = weightsArr.concat(childWeights);
+            }
+        } else {
+            weightsArr.push([elmt.getData()[0], 1]);
+        }
+        return weightsArr;
+    };
 
 //    this.getFinalScore = function () {
 //        var tempMatrix = JSON.parse(JSON.stringify(dataMatrix));

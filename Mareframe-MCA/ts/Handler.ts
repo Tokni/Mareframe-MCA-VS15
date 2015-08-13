@@ -1,27 +1,37 @@
 ﻿module Mareframe {
     export module DST {
         export class Handler {
-            private modelArr: Model[]=[];
-            private activeModel: Model;
-            private fileHandler: FileIO;
-            private gui;
+            private m_modelArr: Model[]=[];
+            private m_activeModel: Model;
+            private m_fileHandler: FileIO;
+            private m_gui: GUIHandler;
             constructor() {
-                this.fileHandler = new FileIO();
+                
+                this.m_fileHandler = new FileIO();
+                console.log(this);
+                this.m_activeModel = this.addNewModel();
+                this.m_gui = new GUIHandler(this.m_activeModel);
+
+                console.log("handler started");
                 var loadModel:string = Tools.getUrlParameter('model');
                 if (loadModel !== null) {
-                    this.fileHandler.loadModel(loadModel);
+                    this.m_fileHandler.loadModel(loadModel, this.m_activeModel, this.m_gui.importStage);
+                    
                 } else {
-                this.addNewModel();
+                    this.m_gui.m_editorMode = true;
                 }
 
 
             }
 
-            getGUI(): any {
+            getGUI(): GUIHandler {
+                return this.m_gui;
             }
-            setGUI(any): void {
+            setGUI(p_gui: GUIHandler): void {
+                this.m_gui = p_gui
             }
-            getFileIO(): any {
+            getFileIO(): FileIO {
+                return this.m_fileHandler;
             }
             addNewModel(): Model {
                 var mdl = new Model;
@@ -29,8 +39,8 @@
                 //this.getGUI().clear();
                 return mdl;
             }
-            setActiveModel(mdl: Model): void {
-                this.activeModel = mdl;
+            setActiveModel(p_mdl: Model): void {
+                this.m_activeModel = p_mdl;
             }
         }
     }
